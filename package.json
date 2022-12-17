@@ -1,12 +1,14 @@
 {
   "name": "@troyv/lightboxing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "dist/lightboxing.js",
   "exports": {
     ".": "./dist/lightboxing.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build"
