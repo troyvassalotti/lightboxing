@@ -1,2 +1,2 @@
-export { Lightbox } from './lightbox';
-export { LightboxCarousel } from './carousel';
+export { Lightbox } from "./lightbox/lightbox";
+export { LightboxCarousel } from "./carousel/carousel";
