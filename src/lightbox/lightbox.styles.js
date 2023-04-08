@@ -41,7 +41,7 @@ export default css`
     display: none;
   }
 
-  .shadow :first-child {
+  .shadow img {
     block-size: auto;
     display: block;
     max-inline-size: 100%;

@@ -9,6 +9,7 @@ import styles from "./carousel.styles";
  * @slot - Default slot for lightboxes.
  *
  * @cssprop --lightbox-size - Min inline size of each lightbox in the grid.
+ * @cssprop --lightbox-grid-gap - Gap space between lightboxes in the grid.
  */
 export class LightboxCarousel extends LitElement {
   static styles = styles;
