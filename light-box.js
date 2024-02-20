@@ -76,6 +76,23 @@ export default class Lightbox extends LitElement {
 		this.#dialog.close();
 	}
 
+	emitEvent(eventName) {
+		this.dispatchEvent(
+			new CustomEvent(eventName, {
+				bubbles: true,
+				composed: false,
+			}),
+		);
+	}
+
+	previousLightbox() {
+		this.emitEvent("LightboxPrevious");
+	}
+
+	nextLightbox() {
+		this.emitEvent("LightboxNext");
+	}
+
 	#handleSlot(event) {
 		this.image = event.target
 			.assignedElements({flatten: true})[0]
@@ -92,19 +109,9 @@ export default class Lightbox extends LitElement {
 					this.open = this.#dialog.open;
 
 					if (this.open) {
-						this.dispatchEvent(
-							new CustomEvent("LightboxOpened", {
-								bubbles: true,
-								composed: false,
-							}),
-						);
+						this.emitEvent("LightboxOpened");
 					} else {
-						this.dispatchEvent(
-							new CustomEvent("LightboxClosed", {
-								bubbles: true,
-								composed: false,
-							}),
-						);
+						this.emitEvent("LightboxClosed");
 					}
 				}
 			}
@@ -122,8 +129,8 @@ export default class Lightbox extends LitElement {
 				<button @click=${this.closeLightbox}>Close</button>
 				${this.navigation
 					? html`
-							<button>Previous</button>
-							<button>Next</button>
+							<button @click=${this.previousLightbox}>Previous</button>
+							<button @click=${this.nextLightbox}>Next</button>
 						`
 					: html``}
 				${this.image}

@@ -1,7 +1,6 @@
 /** @format */
 
 import {LitElement, html, css} from "lit";
-import TinyGesture from "tinygesture";
 
 /**
  * @element lightbox-carousel
@@ -37,7 +36,7 @@ export default class LightboxCarousel extends LitElement {
 
 	static get properties() {
 		return {
-			activeLightbox: {state: true},
+			activeLightbox: {state: true, type: Object},
 			open: {state: true},
 		};
 	}
@@ -45,19 +44,18 @@ export default class LightboxCarousel extends LitElement {
 	constructor() {
 		super();
 		this.activeLightbox;
-		this.gesture = new TinyGesture(this);
 	}
 
 	get #lightboxes() {
 		return this.querySelectorAll("light-box");
 	}
 
-	#handleSwipeLeft = () => {
+	#handlePreviousLightbox = () => {
 		const index = this.activeLightbox.index + 1;
 		this.#handleChangingLightboxes(index);
 	};
 
-	#handleSwipeRight = () => {
+	#handleNextLightbox = () => {
 		const index = this.activeLightbox.index - 1;
 		this.#handleChangingLightboxes(index);
 	};
@@ -71,7 +69,7 @@ export default class LightboxCarousel extends LitElement {
 		}
 	};
 
-	#lightboxOpenedEvent = () => {
+	#handleOpenedLightbox = () => {
 		this.#lightboxes.forEach((node, index) => {
 			if (node.open) {
 				this.activeLightbox = {
@@ -80,15 +78,13 @@ export default class LightboxCarousel extends LitElement {
 				};
 			}
 		});
-
-		this.gesture.on("swiperight", this.#handleSwipeRight);
-		this.gesture.on("swipeleft", this.#handleSwipeLeft);
 	};
 
-	#lightboxClosedEvent = () => {
+	/**
+	 * @todo this is returning null in navigation and you can only navigate between two before it breaks
+	 */
+	#handleClosedLightbox = () => {
 		this.activeLightbox = null;
-		this.gesture.off("swiperight");
-		this.gesture.off("swipeleft");
 	};
 
 	handleSlotchange() {
@@ -101,13 +97,10 @@ export default class LightboxCarousel extends LitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.addEventListener("LightboxOpened", this.#lightboxOpenedEvent);
-		this.addEventListener("LightboxClosed", this.#lightboxClosedEvent);
-	}
-
-	disconnectedCallback() {
-		gesture.destroy();
-		super.disconnectedCallback();
+		this.addEventListener("LightboxOpened", this.#handleOpenedLightbox);
+		this.addEventListener("LightboxClosed", this.#handleClosedLightbox);
+		this.addEventListener("LightboxPrevious", this.#handlePreviousLightbox);
+		this.addEventListener("LightboxNext", this.#handleNextLightbox);
 	}
 }
 
