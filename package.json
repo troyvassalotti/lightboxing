@@ -9,7 +9,7 @@
 	"scripts": {
 		"format": "npx prettier --write .",
 		"start": "npx http-server .",
-		"preversion": "npm run format",
+		"preversion": "npm run format && git add .",
 		"postversion": "npm pack && npm publish"
 	},
 	"dependencies": {
