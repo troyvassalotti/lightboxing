@@ -10,7 +10,7 @@
 		"format": "npx prettier --write .",
 		"start": "npx http-server .",
 		"preversion": "npm run format && git add .",
-		"postversion": "npm pack && npm publish"
+		"postversion": "git push && npm pack && npm publish"
 	},
 	"dependencies": {
 		"lit": "^3.1.2"
