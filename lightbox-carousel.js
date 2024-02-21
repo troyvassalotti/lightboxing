@@ -9,7 +9,6 @@ import {LitElement, html, css} from "lit";
  * @slot - Default slot for lightboxes.
  *
  * @cssprop --lightbox-size - Min inline size of each lightbox in the grid.
- * @cssprop --lightbox-grid-gap - Gap space between lightboxes in the grid.
  */
 export default class LightboxCarousel extends LitElement {
 	static get styles() {
@@ -17,10 +16,10 @@ export default class LightboxCarousel extends LitElement {
 			:host {
 				box-sizing: border-box;
 				display: grid;
-				gap: var(--lightbox-grid-gap, 1rem);
+				gap: 1rem;
 				grid-template-columns: repeat(
 					auto-fill,
-					minmax(var(--lightbox-size, 16rem), 1fr)
+					minmax(var(--lightbox-size, 14rem), 1fr)
 				);
 				grid-template-rows: masonry;
 				justify-items: center;
@@ -34,73 +33,56 @@ export default class LightboxCarousel extends LitElement {
 		`;
 	}
 
-	static get properties() {
-		return {
-			activeLightbox: {state: true, type: Object},
-			open: {state: true},
-		};
+	/** All child light-box elements. */
+	get lightboxes() {
+		return Array.from(this.querySelectorAll("light-box"));
 	}
 
-	constructor() {
-		super();
-		this.activeLightbox;
-	}
+	#handlePreviousLightbox({target}) {
+		const previous = this.lightboxes.find(
+			(node) => node.carouselIndex === target.carouselIndex - 1,
+		);
 
-	get #lightboxes() {
-		return this.querySelectorAll("light-box");
-	}
-
-	#handlePreviousLightbox = () => {
-		const index = this.activeLightbox.index + 1;
-		this.#handleChangingLightboxes(index);
-	};
-
-	#handleNextLightbox = () => {
-		const index = this.activeLightbox.index - 1;
-		this.#handleChangingLightboxes(index);
-	};
-
-	#handleChangingLightboxes = (index) => {
-		for (const node of this.#lightboxes.entries()) {
-			if (node[0] === index) {
-				this.activeLightbox.node.closeLightbox();
-				node[1].openLightbox();
-			}
+		if (previous) {
+			previous.open();
+		} else {
+			// open the last lightbox instead
+			this.lightboxes[this.lightboxes.length - 1].open();
 		}
-	};
 
-	#handleOpenedLightbox = () => {
-		this.#lightboxes.forEach((node, index) => {
-			if (node.open) {
-				this.activeLightbox = {
-					node,
-					index,
-				};
-			}
+		target.close();
+	}
+
+	#handleNextLightbox({target}) {
+		const next = this.lightboxes.find(
+			(node) => node.carouselIndex === target.carouselIndex + 1,
+		);
+
+		if (next) {
+			next.open();
+		} else {
+			// open the first lightbox instead
+			this.lightboxes[0].open();
+		}
+
+		target.close();
+	}
+
+	#handleSlot() {
+		this.lightboxes.forEach((box, index) => {
+			box.navigation = true;
+			box.carouselIndex = index;
 		});
-	};
-
-	/**
-	 * @todo this is returning null in navigation and you can only navigate between two before it breaks
-	 */
-	#handleClosedLightbox = () => {
-		this.activeLightbox = null;
-	};
-
-	handleSlotchange() {
-		this.#lightboxes.forEach((box) => (box.navigation = true));
 	}
 
 	render() {
-		return html`<slot @slotchange=${this.handleSlotchange}></slot>`;
+		return html`<slot @slotchange=${this.#handleSlot}></slot>`;
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.addEventListener("LightboxOpened", this.#handleOpenedLightbox);
-		this.addEventListener("LightboxClosed", this.#handleClosedLightbox);
-		this.addEventListener("LightboxPrevious", this.#handlePreviousLightbox);
-		this.addEventListener("LightboxNext", this.#handleNextLightbox);
+		this.addEventListener("light-box-previous", this.#handlePreviousLightbox);
+		this.addEventListener("light-box-next", this.#handleNextLightbox);
 	}
 }
 

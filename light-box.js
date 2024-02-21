@@ -6,12 +6,18 @@ import {html, css, LitElement} from "lit";
  * @element light-box
  * @summary Create a lightbox for your slotted media.
  *
- * @attr {Boolean} open - The open/closed state of the lightbox.
+ * @slot - Default slot for `img` or `picture` elements, or anything containing a picture, really.
+ *
+ * @attr {boolean} illuminated - The open/closed state of the lightbox.
+ * @attr {boolean} navigation - Lightbox uses navigation within a carousel.
+ * @attr {number} carouselindex - Position of the light-box in a carousel.
  *
  * @prop {HTMLElement} image - The slotted media.
  *
- * @fires LightboxOpened
- * @fires LightboxClosed
+ * @fires light-box-open
+ * @fires light-box-close
+ * @fires light-box-previous
+ * @fires light-box-next
  */
 export default class Lightbox extends LitElement {
 	static get styles() {
@@ -37,14 +43,36 @@ export default class Lightbox extends LitElement {
 				block-size: auto;
 			}
 
+			button {
+				cursor: pointer;
+				font: inherit;
+				padding-block: 0.25em;
+				padding-inline: 0.5em;
+			}
+
+			.close-container {
+				display: flex;
+				justify-content: end;
+			}
+
 			dialog::backdrop {
 				background-color: rgba(0, 0, 0, 0.8);
 			}
 
-			dialog img {
+			dialog :is(picture, img) {
 				block-size: auto;
 				display: block;
 				max-inline-size: 100%;
+			}
+
+			dialog > * + * {
+				margin-block-start: 1em;
+			}
+
+			.navigation {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
 			}
 		`;
 	}
@@ -52,30 +80,29 @@ export default class Lightbox extends LitElement {
 	static get properties() {
 		return {
 			image: {state: true},
-			open: {type: Boolean, reflect: true},
-			navigation: {type: Boolean, reflect: true},
+			illuminated: {type: Boolean},
+			navigation: {type: Boolean},
+			carouselIndex: {type: Number},
 		};
 	}
 
 	constructor() {
 		super();
 		this.image;
-		this.open = false;
-		this.hasNavigation = false;
+		this.illuminated = false;
+		this.navigation = false;
+		this.carouselIndex = 0;
 	}
 
+	/**
+	 * Dialog element in the shadow root.
+	 * @type {HTMLDialogElement}
+	 */
 	get #dialog() {
 		return this.shadowRoot.querySelector("dialog");
 	}
 
-	openLightbox() {
-		this.#dialog.showModal();
-	}
-
-	closeLightbox() {
-		this.#dialog.close();
-	}
-
+	/** Helper for emitting custom events on interaction. */
 	emitEvent(eventName) {
 		this.dispatchEvent(
 			new CustomEvent(eventName, {
@@ -85,55 +112,90 @@ export default class Lightbox extends LitElement {
 		);
 	}
 
+	/** Open the lightbox. */
+	open() {
+		this.#dialog.showModal();
+	}
+
+	/** Close the lightbox. */
+	close() {
+		this.#dialog.close();
+	}
+
+	/** Emit event signaling a backwards navigation. */
 	previousLightbox() {
-		this.emitEvent("LightboxPrevious");
+		this.emitEvent("light-box-previous");
 	}
 
+	/** Emit event signaling a forwards navigation. */
 	nextLightbox() {
-		this.emitEvent("LightboxNext");
+		this.emitEvent("light-box-next");
 	}
 
-	#handleSlot(event) {
-		this.image = event.target
-			.assignedElements({flatten: true})[0]
-			.cloneNode(true);
-	}
-
+	/**
+	 * Create and activate a mutation observer on the dialog element to watch for changes to its open state.
+	 *
+	 * @returns {MutationObserver}
+	 */
 	setDialogObserver() {
 		const dialogObserver = new MutationObserver((mutationList) => {
-			for (const mutation of mutationList) {
-				if (
-					mutation.type === "attributes" &&
-					mutation.attributeName === "open"
-				) {
-					this.open = this.#dialog.open;
+			for (const {type, attributeName} of mutationList) {
+				if (type === "attributes" && attributeName === "open") {
+					this.illuminated = this.#dialog.open;
 
-					if (this.open) {
-						this.emitEvent("LightboxOpened");
-					} else {
-						this.emitEvent("LightboxClosed");
-					}
+					this.illuminated
+						? this.emitEvent("light-box-open")
+						: this.emitEvent("light-box-close");
 				}
 			}
 		});
 
 		dialogObserver.observe(this.#dialog, {attributes: true});
+
+		return dialogObserver;
+	}
+
+	/** Sets image state on slot change. */
+	#handleSlot(event) {
+		this.image = event.target
+			.assignedElements({flatten: true})[0]
+			.cloneNode(true);
+
+		return this.image;
 	}
 
 	render() {
 		return html`
 			<slot
-				@click=${this.openLightbox}
+				@click=${this.open}
 				@slotchange=${this.#handleSlot}></slot>
-			<dialog>
-				<button @click=${this.closeLightbox}>Close</button>
+			<dialog part="lightbox-dialog">
+				<div
+					part="close-container"
+					class="close-container">
+					<button
+						part="close-button"
+						@click=${this.close}>
+						Close
+					</button>
+				</div>
+				${this.image}
 				${this.navigation
 					? html`
-							<button @click=${this.previousLightbox}>Previous</button>
-							<button @click=${this.nextLightbox}>Next</button>
+							<div class="navigation">
+								<button
+									part="previous-button"
+									@click=${this.previousLightbox}>
+									&lt; Previous
+								</button>
+								<button
+									part="next-button"
+									@click=${this.nextLightbox}>
+									Next &gt;
+								</button>
+							</div>
 						`
 					: html``}
-				${this.image}
 			</dialog>
 		`;
 	}
