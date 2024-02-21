@@ -8,9 +8,28 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0" />
 		<title>Lightboxing</title>
-		<link
-			rel="stylesheet"
-			href="https://cdn.simplecss.org/simple.min.css" />
+		<style>
+			html {
+				box-sizing: border-box;
+			}
+
+			*,
+			*::after,
+			*::before {
+				box-sizing: inherit;
+			}
+
+			body {
+				font-family: system-ui;
+			}
+
+			img {
+				block-size: auto;
+				display: block;
+				inline-size: 100%;
+				max-inline-size: 100%;
+			}
+		</style>
 		<!-- for browsers that don't natively support import maps -->
 		<!-- <script async src="https://esm.sh/es-module-shims"></script> -->
 		<script type="importmap">
@@ -28,37 +47,38 @@
 		<main>
 			<lightbox-carousel>
 				<light-box>
-					<img
-						src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						lightbox="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						alt=""
-						width="300"
-						height="300"
-						decoding="async"
-						loading="lazy" />
+					<button>
+						<img
+							src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+							alt=""
+							width="300"
+							height="300"
+							decoding="async"
+							loading="lazy" />
+					</button>
 				</light-box>
 				<light-box>
-					<img
-						src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						lightbox="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						alt=""
-						width="500"
-						height="500"
-						decoding="async"
-						loading="lazy" />
+					<button>
+						<img
+							src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+							alt=""
+							width="500"
+							height="500"
+							decoding="async"
+							loading="lazy" />
+					</button>
 				</light-box>
 				<light-box>
-					<img
-						src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						lightbox="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-						alt=""
-						width="300"
-						height="300"
-						decoding="async"
-						loading="lazy" />
-				</light-box>
-				<light-box
-					><picture>
+					<button>
+						<img
+							src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+							alt=""
+							width="300"
+							height="300"
+							decoding="async"
+							loading="lazy" />
+					</button>
+					<picture slot="lightbox">
 						<source
 							srcset="
 								https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
@@ -66,30 +86,49 @@
 							media="(orientation: portrait)" />
 						<img
 							src="https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-							alt="" /> </picture
-				></light-box>
+							alt="" />
+					</picture>
+				</light-box>
+				<light-box>
+					<button>
+						<picture>
+							<source
+								srcset="
+									https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
+								"
+								media="(orientation: portrait)" />
+							<img
+								src="https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+								alt="" />
+						</picture>
+					</button>
+				</light-box>
 			</lightbox-carousel>
 			<light-box>
-				<img
-					src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-					lightbox="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
-					alt=""
-					width="300"
-					height="300"
-					decoding="async"
-					loading="lazy" />
-			</light-box>
-			<light-box
-				><picture>
-					<source
-						srcset="
-							https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
-						"
-						media="(orientation: portrait)" />
+				<button>
 					<img
-						src="https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-						alt="" /> </picture
-			></light-box>
+						src="https://images.unsplash.com/photo-1650140639930-9f0f7372e0a7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+						alt=""
+						width="300"
+						height="300"
+						decoding="async"
+						loading="lazy" />
+				</button>
+			</light-box>
+			<light-box>
+				<button>
+					<picture>
+						<source
+							srcset="
+								https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
+							"
+							media="(orientation: portrait)" />
+						<img
+							src="https://images.unsplash.com/photo-1671314888213-7e724de48113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+							alt="" />
+					</picture>
+				</button>
+			</light-box>
 		</main>
 	</body>
 </html>

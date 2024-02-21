@@ -33,38 +33,55 @@ export default class LightboxCarousel extends LitElement {
 		`;
 	}
 
+	constructor() {
+		super();
+		this.previousLightbox = null;
+		this.nextLightbox = null;
+	}
+
 	/** All child light-box elements. */
 	get lightboxes() {
 		return Array.from(this.querySelectorAll("light-box"));
 	}
 
-	#handlePreviousLightbox({target}) {
+	get #previousLightbox() {
+		return this.previousLightbox;
+	}
+
+	set #previousLightbox(target) {
 		const previous = this.lightboxes.find(
 			(node) => node.carouselIndex === target.carouselIndex - 1,
 		);
 
-		if (previous) {
-			previous.open();
-		} else {
-			// open the last lightbox instead
-			this.lightboxes[this.lightboxes.length - 1].open();
-		}
-
-		target.close();
+		this.previousLightbox =
+			previous ?? this.lightboxes[this.lightboxes.length - 1];
 	}
 
-	#handleNextLightbox({target}) {
+	get #nextLightbox() {
+		return this.nextLightbox;
+	}
+
+	set #nextLightbox(target) {
 		const next = this.lightboxes.find(
 			(node) => node.carouselIndex === target.carouselIndex + 1,
 		);
 
-		if (next) {
-			next.open();
-		} else {
-			// open the first lightbox instead
-			this.lightboxes[0].open();
-		}
+		this.nextLightbox = next ?? this.lightboxes[0];
+	}
 
+	#handleOpenLightbox({target}) {
+		this.open = true;
+		this.#nextLightbox = target;
+		this.#previousLightbox = target;
+	}
+
+	#handlePreviousLightbox({target}) {
+		this.#previousLightbox.open();
+		target.close();
+	}
+
+	#handleNextLightbox({target}) {
+		this.#nextLightbox.open();
 		target.close();
 	}
 
@@ -81,6 +98,7 @@ export default class LightboxCarousel extends LitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
+		this.addEventListener("light-box-open", this.#handleOpenLightbox);
 		this.addEventListener("light-box-previous", this.#handlePreviousLightbox);
 		this.addEventListener("light-box-next", this.#handleNextLightbox);
 	}

@@ -6,7 +6,8 @@ import {html, css, LitElement} from "lit";
  * @element light-box
  * @summary Create a lightbox for your slotted media.
  *
- * @slot - Default slot for `img` or `picture` elements, or anything containing a picture, really.
+ * @slot - Default slot for a `button` containing `img` or `picture` elements, or anything containing a picture, really.
+ * @slot lightbox - Slot in a different image than initially seen for the lightbox.
  *
  * @attr {boolean} illuminated - The open/closed state of the lightbox.
  * @attr {boolean} navigation - Lightbox uses navigation within a carousel.
@@ -33,14 +34,12 @@ export default class Lightbox extends LitElement {
 				box-sizing: inherit;
 			}
 
-			::slotted(*) {
+			::slotted(button) {
+				appearanece: none;
+				background-color: transparent;
+				border: none;
 				cursor: zoom-in;
-				inline-size: inherit;
-				object-fit: cover;
-			}
-
-			::slotted([height]) {
-				block-size: auto;
+				padding: 0;
 			}
 
 			button {
@@ -59,14 +58,16 @@ export default class Lightbox extends LitElement {
 				background-color: rgba(0, 0, 0, 0.8);
 			}
 
+			dialog .content {
+				display: grid;
+				gap: 1rem;
+			}
+
 			dialog :is(picture, img) {
 				block-size: auto;
 				display: block;
+				inline-size: 100%;
 				max-inline-size: 100%;
-			}
-
-			dialog > * + * {
-				margin-block-start: 1em;
 			}
 
 			.navigation {
@@ -102,6 +103,10 @@ export default class Lightbox extends LitElement {
 		return this.shadowRoot.querySelector("dialog");
 	}
 
+	get #button() {
+		return this.querySelector("button");
+	}
+
 	/** Helper for emitting custom events on interaction. */
 	emitEvent(eventName) {
 		this.dispatchEvent(
@@ -113,14 +118,14 @@ export default class Lightbox extends LitElement {
 	}
 
 	/** Open the lightbox. */
-	open() {
+	open = () => {
 		this.#dialog.showModal();
-	}
+	};
 
 	/** Close the lightbox. */
-	close() {
+	close = () => {
 		this.#dialog.close();
-	}
+	};
 
 	/** Emit event signaling a backwards navigation. */
 	previousLightbox() {
@@ -157,47 +162,57 @@ export default class Lightbox extends LitElement {
 
 	/** Sets image state on slot change. */
 	#handleSlot(event) {
-		this.image = event.target
-			.assignedElements({flatten: true})[0]
-			.cloneNode(true);
+		const slottedElements = event.target.assignedElements({flatten: true});
+		const firstElement = slottedElements[0];
+
+		if (firstElement instanceof HTMLButtonElement) {
+			this.image = firstElement.firstElementChild?.cloneNode(true);
+		}
 
 		return this.image;
 	}
 
 	render() {
 		return html`
-			<slot
-				@click=${this.open}
-				@slotchange=${this.#handleSlot}></slot>
+			<slot @slotchange=${this.#handleSlot}></slot>
 			<dialog part="lightbox-dialog">
 				<div
-					part="close-container"
-					class="close-container">
-					<button
-						part="close-button"
-						@click=${this.close}>
-						Close
-					</button>
+					part="dialog-content"
+					class="content">
+					<div
+						part="close-container"
+						class="close-container">
+						<button
+							part="close-button"
+							@click=${this.close}>
+							Close
+						</button>
+					</div>
+					<slot name="lightbox">${this.image}</slot>
+					${this.navigation
+						? html`
+								<div class="navigation">
+									<button
+										part="previous-button"
+										@click=${this.previousLightbox}>
+										&lt; Previous
+									</button>
+									<button
+										part="next-button"
+										@click=${this.nextLightbox}>
+										Next &gt;
+									</button>
+								</div>
+							`
+						: html``}
 				</div>
-				${this.image}
-				${this.navigation
-					? html`
-							<div class="navigation">
-								<button
-									part="previous-button"
-									@click=${this.previousLightbox}>
-									&lt; Previous
-								</button>
-								<button
-									part="next-button"
-									@click=${this.nextLightbox}>
-									Next &gt;
-								</button>
-							</div>
-						`
-					: html``}
 			</dialog>
 		`;
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this.#button?.addEventListener("click", this.open);
 	}
 
 	firstUpdated() {
