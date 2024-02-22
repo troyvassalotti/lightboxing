@@ -37,14 +37,14 @@ You either need a bundling solution that will handle the bare module imports fro
 </script>
 <script
 	type="module"
-	src="type-writer.js"></script>
+	src="lightboxing.js"></script>
 ```
 
 Since all elements are slotted, it is _up to you_ to create your ideal responsive media styles in your site or application. Reasonable defaults are applied when possible, but do not rely solely on the components to make your images responsive.
 
 ### `<light-box>`
 
-Slot in a `<button>` with your preferred media element - `img` or `picture`. Clicking on your image will open a lightbox.
+Slot in your preferred media element - `img` or `picture`. Clicking on your image will open a lightbox.
 
 ### `<lightbox-carousel>`
 

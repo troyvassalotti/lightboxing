@@ -6,13 +6,13 @@ import {html, css, LitElement} from "lit";
  * @element light-box
  * @summary Create a lightbox for your slotted media.
  *
- * @slot - Default slot for a `button` containing `img` or `picture` elements, or anything containing a picture, really.
+ * @slot - Default slot for img` or `picture` elements, or anything containing a picture, really.
  * @slot lightbox - Slot in a different image than initially seen for the lightbox.
  *
  * @attr {boolean} illuminated - The open/closed state of the lightbox.
  * @attr {boolean} navigation - Lightbox uses navigation within a carousel.
- * @attr {number} carouselindex - Position of the light-box in a carousel.
  *
+ * @prop {number} carouselindex - Position of the light-box in a carousel.
  * @prop {HTMLElement} image - The slotted media.
  *
  * @fires light-box-open
@@ -34,19 +34,12 @@ export default class Lightbox extends LitElement {
 				box-sizing: inherit;
 			}
 
-			::slotted(button) {
+			.trigger {
 				appearanece: none;
 				background-color: transparent;
 				border: none;
 				cursor: zoom-in;
 				padding: 0;
-			}
-
-			button {
-				cursor: pointer;
-				font: inherit;
-				padding-block: 0.25em;
-				padding-inline: 0.5em;
 			}
 
 			.close-container {
@@ -75,14 +68,18 @@ export default class Lightbox extends LitElement {
 				flex-wrap: wrap;
 				justify-content: space-between;
 			}
+
+			button:not(.trigger) {
+				cursor: pointer;
+			}
 		`;
 	}
 
 	static get properties() {
 		return {
 			image: {state: true},
-			illuminated: {type: Boolean},
-			navigation: {type: Boolean},
+			illuminated: {type: Boolean, reflect: true},
+			navigation: {type: Boolean, reflect: true},
 			carouselIndex: {type: Number},
 		};
 	}
@@ -101,10 +98,6 @@ export default class Lightbox extends LitElement {
 	 */
 	get #dialog() {
 		return this.shadowRoot.querySelector("dialog");
-	}
-
-	get #button() {
-		return this.querySelector("button");
 	}
 
 	/** Helper for emitting custom events on interaction. */
@@ -165,16 +158,18 @@ export default class Lightbox extends LitElement {
 		const slottedElements = event.target.assignedElements({flatten: true});
 		const firstElement = slottedElements[0];
 
-		if (firstElement instanceof HTMLButtonElement) {
-			this.image = firstElement.firstElementChild?.cloneNode(true);
-		}
+		this.image = firstElement?.cloneNode(true);
 
 		return this.image;
 	}
 
 	render() {
 		return html`
-			<slot @slotchange=${this.#handleSlot}></slot>
+			<button
+				class="trigger"
+				@click=${this.open}>
+				<slot @slotchange=${this.#handleSlot}></slot>
+			</button>
 			<dialog part="lightbox-dialog">
 				<div
 					part="dialog-content"
@@ -208,11 +203,6 @@ export default class Lightbox extends LitElement {
 				</div>
 			</dialog>
 		`;
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
-		this.#button?.addEventListener("click", this.open);
 	}
 
 	firstUpdated() {
