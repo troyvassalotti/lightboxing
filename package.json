@@ -13,7 +13,7 @@
 		"postversion": "git push && npm pack && npm publish"
 	},
 	"dependencies": {
-		"lit": "^3.1.2"
+		"lit": "^3.3.1"
 	},
 	"devDependencies": {
 		"@troyv/common-config": "latest",
